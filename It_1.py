@@ -7,6 +7,22 @@ from random import choice
 
 class PyGameSoundGridView(object):
 	"""View of sound grid model """
+	def __init__(self,model,size):
+		self.model = model
+		self.screen = pygame.display.set_mode(size)
+	
+
+	def draw(self):
+		"""Draw the blocks to the pygame window"""
+		self.screen.fill(pygame.Color('black'))
+		for block in self.model.blocks:
+			r = pygame.Rect(block.left,
+							block.top,
+							block.size,
+							block.size)
+			pygame.draw.rect(self.screen, pygame.Color('blue'),r)
+		pygame.display.update()
+
 
 class SoundGridModel(object):
 	"""Represents the interaction state for the visualization"""
@@ -28,15 +44,51 @@ class SoundGridModel(object):
 										 top,
 										 self.BLOCK_SIZE))
 	#def update(self):
-		#"""Update the model state"""
+	#	"""Update the model state"""
 
 
 
 class Block(object):
 	"""Represents a block in the musical visualization grid"""
-	def __init__(self, left, top, width, height):
+	def __init__(self, left, top, size):
 		""""Initializes a block object with the geometry and color"""
 		self.left = left
 		self.top = top
-		self.width = height
-		self.color = color
+		self.size = size
+		#self.color = color
+
+class PyGameMouseController(object):
+	def __init__(self,model):
+		self.model = model
+
+	def handle_event(self, event):
+		""" Look for mouse cursor position and clicks to 
+		activate sound"""
+
+		if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+			print "Button Pressed" 
+			if pygame.mouse.get_pos() > 
+		elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+			print "Button Released" 
+			print pygame.mouse.get_pos()
+ 
+		# if pygame.mouse.get_pressed()[0]:
+		# 	self.model.block.color = 'white'
+
+if __name__ == '__main__':
+	pygame.init()
+	size = (640,480)
+
+	model = SoundGridModel(size[0],size[1])
+	view = PyGameSoundGridView(model,size)
+	controller = PyGameMouseController(model)
+	running = True
+	while running: 
+		for event in pygame.event.get():
+			if event.type == QUIT:
+				running = False
+			else:
+				controller.handle_event(event)
+		#model.update()
+		view.draw()
+		time.sleep(.001)
