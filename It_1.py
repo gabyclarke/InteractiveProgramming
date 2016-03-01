@@ -64,15 +64,15 @@ class PyGameMouseController(object):
 	def handle_event(self, event):
 		""" Look for mouse cursor position and clicks to 
 		activate sound"""
+		pygame.mixer.music.load('Cobwebs.mp3')
 
 		if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-			print "Button Pressed" 
-			pygame.mixer.music.load('Reflektor.wav')
+			print "Button Pressed" 			
 			pygame.mixer.music.play(0)
 			# if pygame.mouse.get_pos() 
-		elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-			print "Button Released" 
-			print pygame.mouse.get_pos()
+		# elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+		# 	print "Button Released" 
+		# 	print pygame.mouse.get_pos()
  
 		# if pygame.mouse.get_pressed()[0]:
 		# 	self.model.block.color = 'white'
