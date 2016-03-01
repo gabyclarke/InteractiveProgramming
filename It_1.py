@@ -67,7 +67,9 @@ class PyGameMouseController(object):
 
 		if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 			print "Button Pressed" 
-			if pygame.mouse.get_pos() > 
+			pygame.mixer.music.load('Reflektor.wav')
+			pygame.mixer.music.play(0)
+			# if pygame.mouse.get_pos() 
 		elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
 			print "Button Released" 
 			print pygame.mouse.get_pos()
