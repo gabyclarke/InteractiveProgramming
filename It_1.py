@@ -5,6 +5,8 @@ from pygame.locals import QUIT, KEYDOWN
 import time
 from random import choice
 
+global block_ranges
+
 class PyGameSoundGridView(object):
 	"""View of sound grid model """
 	def __init__(self,model,size):
@@ -33,6 +35,11 @@ class SoundGridModel(object):
 		self.BLOCK_SIZE = 20
 		self.MARGIN = 5
 
+		global block_ranges
+		block_ranges = dict()
+
+		index = 0
+
 		self.blocks = []
 		for left in range(self.MARGIN, #beginning of range
 						  self.width - self.MARGIN - self.BLOCK_SIZE, #end of range
@@ -43,6 +50,9 @@ class SoundGridModel(object):
 				self.blocks.append(Block(left,
 										 top,
 										 self.BLOCK_SIZE))
+				block_ranges[index] = ((left, left + self.BLOCK_SIZE), (top, top + self.BLOCK_SIZE))
+				index +=1
+
 	#def update(self):
 	#	"""Update the model state"""
 
@@ -66,10 +76,17 @@ class PyGameMouseController(object):
 		activate sound"""
 		pygame.mixer.music.load('Cobwebs.mp3')
 
+		global block_ranges
+
 		if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 			print "Button Pressed" 			
-			pygame.mixer.music.play(0)
-			# if pygame.mouse.get_pos() 
+			cursor_position = pygame.mouse.get_pos()
+			for block_range in block_ranges.values():
+				if cursor_position[0] in range(block_range[0][0], block_range[0][1]) and cursor_position[1] in range(block_range[1][0], block_range[1][1]):
+					print block_range[0][0], block_range[1][0]
+
+					pygame.mixer.music.play(0)
+			# if pygame.mouse.get_pos()
 		# elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
 		# 	print "Button Released" 
 		# 	print pygame.mouse.get_pos()
@@ -79,7 +96,7 @@ class PyGameMouseController(object):
 
 if __name__ == '__main__':
 	pygame.init()
-	size = (640,480)
+	size = (420,420)
 
 	model = SoundGridModel(size[0],size[1])
 	view = PyGameSoundGridView(model,size)
