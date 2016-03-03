@@ -22,7 +22,7 @@ class PyGameSoundGridView(object):
 							block.top,
 							block.size,
 							block.size)
-			pygame.draw.rect(self.screen, pygame.Color('blue'),r)
+			pygame.draw.rect(self.screen, pygame.Color('gray'), r)
 		pygame.display.update()
 
 
@@ -83,10 +83,16 @@ class PyGameMouseController(object):
 			cursor_position = pygame.mouse.get_pos()
 			for block_range in block_ranges.values():
 				if cursor_position[0] in range(block_range[0][0], block_range[0][1]) and cursor_position[1] in range(block_range[1][0], block_range[1][1]):
-					print block_range[0][0], block_range[1][0]
-
+					left = block_range[0][0]
+					top = block_range[1][0]
+					print left, top
+					# r = pygame.Rect(left,
+					# 	top,
+					# 	block.size,  # INHERIT BLOCK_SIZE?
+					# 	block.size)
+					# pygame.draw.rect(self.screen, pygame.Color('white'), r)
 					pygame.mixer.music.play(0)
-			# if pygame.mouse.get_pos()
+
 		# elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
 		# 	print "Button Released" 
 		# 	print pygame.mouse.get_pos()
