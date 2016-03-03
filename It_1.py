@@ -22,7 +22,7 @@ class PyGameSoundGridView(object):
 							block.top,
 							block.size,
 							block.size)
-			pygame.draw.rect(self.screen, pygame.Color('gray'), r)
+			pygame.draw.rect(self.screen, pygame.Color(block.color), r)
 		pygame.display.update()
 
 
@@ -60,12 +60,12 @@ class SoundGridModel(object):
 
 class Block(object):
 	"""Represents a block in the musical visualization grid"""
-	def __init__(self, left, top, size):
+	def __init__(self, left, top, size,color = 'white'):
 		""""Initializes a block object with the geometry and color"""
 		self.left = left
 		self.top = top
 		self.size = size
-		#self.color = color
+		self.color = color
 
 class PyGameMouseController(object):
 	def __init__(self,model):
@@ -79,19 +79,23 @@ class PyGameMouseController(object):
 		global block_ranges
 
 		if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-			print "Button Pressed" 			
+			print "Button Pressed" 	
+			b = choice(self.model.blocks)
+			b.color = "red"		
 			cursor_position = pygame.mouse.get_pos()
 			for block_range in block_ranges.values():
 				if cursor_position[0] in range(block_range[0][0], block_range[0][1]) and cursor_position[1] in range(block_range[1][0], block_range[1][1]):
 					left = block_range[0][0]
 					top = block_range[1][0]
-					print left, top
+					pygame.mixer.music.play(0)
+					print self.model.BLOCK_SIZE
+            		print left, top
 					# r = pygame.Rect(left,
 					# 	top,
 					# 	block.size,  # INHERIT BLOCK_SIZE?
 					# 	block.size)
 					# pygame.draw.rect(self.screen, pygame.Color('white'), r)
-					pygame.mixer.music.play(0)
+
 
 		# elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
 		# 	print "Button Released" 
