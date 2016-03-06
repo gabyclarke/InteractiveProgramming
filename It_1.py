@@ -12,12 +12,12 @@ class PyGameSoundGridView(object):
 	def __init__(self,model,size):
 		self.model = model
 		self.screen = pygame.display.set_mode(size)
-	
+		
 
 	def draw(self):
 		"""Draw the blocks to the pygame window"""
 		self.screen.fill(pygame.Color('black'))
-		for block in self.model.blocks:
+		for block in self.model.blocks.values():
 			r = pygame.Rect(block.left,
 							block.top,
 							block.size,
@@ -36,22 +36,24 @@ class SoundGridModel(object):
 		self.MARGIN = 5
 
 		global block_ranges
+		#create dictionary for  block ranges
 		block_ranges = dict()
 
 		index = 0
-
-		self.blocks = []
+		#create dictionary for blocks
+		self.blocks = dict()
 		for left in range(self.MARGIN, #beginning of range
 						  self.width - self.MARGIN - self.BLOCK_SIZE, #end of range
 						  self.MARGIN + self.BLOCK_SIZE): #step size
 			for top in range(self.MARGIN, 
 							 self.height,
 							 self.MARGIN + self.BLOCK_SIZE):
-				self.blocks.append(Block(left,
-										 top,
-										 self.BLOCK_SIZE))
+				self.blocks[index] = (Block(left,
+										 	top,
+										 	self.BLOCK_SIZE))
 				block_ranges[index] = ((left, left + self.BLOCK_SIZE), (top, top + self.BLOCK_SIZE))
 				index +=1
+
 
 	#def update(self):
 	#	"""Update the model state"""
@@ -80,18 +82,24 @@ class PyGameMouseController(object):
 
 		if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 			print "Button Pressed" 	
-			b = choice(self.model.blocks)
-			b.color = "red"		
-			cursor_position = pygame.mouse.get_pos()
-			for block_range in block_ranges.values():
+			# b = choice(self.model.blocks)
+			# b.color = "red"		
+			cursor_position = pygame.mouse.get_pos() # get cursor position
+			for index,block_range in block_ranges.items():
 				if cursor_position[0] in range(block_range[0][0], block_range[0][1]) and cursor_position[1] in range(block_range[1][0], block_range[1][1]):
-					left = block_range[0][0]
-					top = block_range[1][0]
+					
+					# left = block_range[0][0]
+					# top = block_range[1][0]
 					pygame.mixer.music.play(0)
-					print self.model.BLOCK_SIZE
-            		print left, top
+					# b = Block(left,top, self.model.BLOCK_SIZE,"blue")
+					b = self.model.blocks[index]
+					b.color= "blue"
+					# b.color = "red"
+					
+					# print self.model.BLOCK_SIZE
+     #        		print left, top
 					# r = pygame.Rect(left,
-					# 	top,
+					# 	top,blocks.app
 					# 	block.size,  # INHERIT BLOCK_SIZE?
 					# 	block.size)
 					# pygame.draw.rect(self.screen, pygame.Color('white'), r)
