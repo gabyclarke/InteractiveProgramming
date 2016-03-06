@@ -28,7 +28,7 @@ class PyGameSoundGridView(object):
 							block.size,
 							block.size)
 			pygame.draw.rect(self.screen, block.color,r) #pygame.Color(block.color), r)
-		pygame.display.update()
+		pygame.display.update()             
 
 
 
@@ -95,17 +95,20 @@ class PyGameMouseController(object):
 			for index,block_range in block_ranges.items():
 				if cursor_position[0] in range(block_range[0][0], block_range[0][1]) and cursor_position[1] in range(block_range[1][0], block_range[1][1]):
 					pygame.mixer.music.play(0)
-					b = self.model.blocks[index]
-					b.color= "blue"
+					# b = self.model.blocks[index]
+					# b.color= "blue"
 
 					left = block_range[0][0]
 					top = block_range[1][0]
 					unit = self.model.MARGIN + self.model.BLOCK_SIZE
 					for index, block_range in block_ranges.items():
 						# print block_range[1] 
-						if block_range[0][0] in range(left - unit - 1, left + unit +1) and block_range[1][0] in range(top - unit - 1, top + unit + 1): 
+						if block_range[0][0] in range(left - unit - 1, left) or block_range[0][0] in range(left+ unit, left+2*unit) and block_range[1][0] in range(top - unit - 1, top):# or block_range[1][0] in range(top+ unit, top +2*unit): 	
+							# if block_range[0][0] != left and block_range[1][0] != top:
+							# 	break
 							gradient = self.model.blocks[index]
 							gradient.color = grey
+								
 
 
 
