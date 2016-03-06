@@ -1,0 +1,11 @@
+Internal rhythm
+	Channel.queue
+
+Block toggles
+
+Record sounds
+Assign sounds
+
+
+Light pulse
+	Middle block doesn't change
