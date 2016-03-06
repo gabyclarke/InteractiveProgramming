@@ -4,8 +4,13 @@ import pygame
 from pygame.locals import QUIT, KEYDOWN
 import time
 from random import choice
+from math import sqrt
+
 
 global block_ranges
+white = (255,255,255,255)
+grey = pygame.Color(233,105,5,200)
+
 
 class PyGameSoundGridView(object):
 	"""View of sound grid model """
@@ -22,8 +27,9 @@ class PyGameSoundGridView(object):
 							block.top,
 							block.size,
 							block.size)
-			pygame.draw.rect(self.screen, pygame.Color(block.color), r)
+			pygame.draw.rect(self.screen, block.color,r) #pygame.Color(block.color), r)
 		pygame.display.update()
+
 
 
 class SoundGridModel(object):
@@ -32,8 +38,10 @@ class SoundGridModel(object):
 		self.width = width
 		self.height = height
 
-		self.BLOCK_SIZE = 20
 		self.MARGIN = 5
+		self.block_no = 12
+		self.BLOCK_SIZE = (size[0] - self.MARGIN *(self.block_no + 1)) /self.block_no
+		
 
 		global block_ranges
 		#create dictionary for  block ranges
@@ -62,7 +70,7 @@ class SoundGridModel(object):
 
 class Block(object):
 	"""Represents a block in the musical visualization grid"""
-	def __init__(self, left, top, size,color = 'white'):
+	def __init__(self, left, top, size,color = white):
 		""""Initializes a block object with the geometry and color"""
 		self.left = left
 		self.top = top
@@ -81,31 +89,27 @@ class PyGameMouseController(object):
 		global block_ranges
 
 		if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-			print "Button Pressed" 	
-			# b = choice(self.model.blocks)
-			# b.color = "red"		
+		
 			cursor_position = pygame.mouse.get_pos() # get cursor position
+
 			for index,block_range in block_ranges.items():
 				if cursor_position[0] in range(block_range[0][0], block_range[0][1]) and cursor_position[1] in range(block_range[1][0], block_range[1][1]):
-					
-					# left = block_range[0][0]
-					# top = block_range[1][0]
 					pygame.mixer.music.play(0)
-					# b = Block(left,top, self.model.BLOCK_SIZE,"blue")
 					b = self.model.blocks[index]
 					b.color= "blue"
-					# b.color = "red"
-					
-					# print self.model.BLOCK_SIZE
-     #        		print left, top
-					# r = pygame.Rect(left,
-					# 	top,blocks.app
-					# 	block.size,  # INHERIT BLOCK_SIZE?
-					# 	block.size)
-					# pygame.draw.rect(self.screen, pygame.Color('white'), r)
+
+					left = block_range[0][0]
+					top = block_range[1][0]
+					unit = self.model.MARGIN + self.model.BLOCK_SIZE
+					for index, block_range in block_ranges.items():
+						# print block_range[1] 
+						if block_range[0][0] in range(left - unit - 1, left + unit +1) and block_range[1][0] in range(top - unit - 1, top + unit + 1): 
+							gradient = self.model.blocks[index]
+							gradient.color = grey
 
 
-		# elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+
+									# elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
 		# 	print "Button Released" 
 		# 	print pygame.mouse.get_pos()
  
