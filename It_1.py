@@ -8,8 +8,11 @@ from math import sqrt
 
 
 global block_ranges
-white = (255,255,255,255)
-grey = pygame.Color(233,105,5,200)
+#colors used
+white = (255,255,255)
+dark_grey = pygame.Color(105,105,105)
+grey = (169,169,169)
+light_grey= (220,220,220)
 
 
 class PyGameSoundGridView(object):
@@ -47,18 +50,23 @@ class SoundGridModel(object):
 		#create dictionary for  block ranges
 		block_ranges = dict()
 
+    
 		index = 0
 		#create dictionary for blocks
 		self.blocks = dict()
+		#left edge of each block
 		for left in range(self.MARGIN, #beginning of range
 						  self.width - self.MARGIN - self.BLOCK_SIZE, #end of range
 						  self.MARGIN + self.BLOCK_SIZE): #step size
+		  #top edge of each block
 			for top in range(self.MARGIN, 
 							 self.height,
 							 self.MARGIN + self.BLOCK_SIZE):
+			  #assign each block an index number
 				self.blocks[index] = (Block(left,
 										 	top,
 										 	self.BLOCK_SIZE))
+			 	#assign block_ranges an index number
 				block_ranges[index] = ((left, left + self.BLOCK_SIZE), (top, top + self.BLOCK_SIZE))
 				index +=1
 
@@ -70,7 +78,7 @@ class SoundGridModel(object):
 
 class Block(object):
 	"""Represents a block in the musical visualization grid"""
-	def __init__(self, left, top, size,color = white):
+	def __init__(self, left, top, size,color = dark_grey):
 		""""Initializes a block object with the geometry and color"""
 		self.left = left
 		self.top = top
@@ -82,8 +90,8 @@ class PyGameMouseController(object):
 		self.model = model
 
 	def handle_event(self, event):
-		""" Look for mouse cursor position and clicks to 
-		activate sound"""
+		""" When a block is clicked, the color of the block changes color and a sound plays
+		    A wave of grey moves out from the block clicked"""
 		pygame.mixer.music.load('Cobwebs.mp3')
 
 		global block_ranges
@@ -102,14 +110,21 @@ class PyGameMouseController(object):
 					top = block_range[1][0]
 					unit = self.model.MARGIN + self.model.BLOCK_SIZE
 					for index, block_range in block_ranges.items():
+						gradient = self.model.blocks[index]
 						# print block_range[1] 
-						if block_range[0][0] in range(left - unit - 1, left) or block_range[0][0] in range(left+ unit, left+2*unit) and block_range[1][0] in range(top - unit - 1, top):# or block_range[1][0] in range(top+ unit, top +2*unit): 	
-							# if block_range[0][0] != left and block_range[1][0] != top:
-							# 	break
-							gradient = self.model.blocks[index]
-							gradient.color = grey
+						# if (block_range[0][0] in range(left - unit - 1, left)
+						# 		or block_range[0][0] in range(left+ unit, left+2*unit) 
+						# 		and block_range[1][0] in range(top - unit - 1, top)
+						# 		or block_range[1][0] in range(top+ unit, top +2*unit)): 	
+						if (block_range[0][0] in range(left - unit - 1, left + unit + 1)
+								and block_range[1][0] in range(top - unit - 1, top + unit + 1)):
+							if block_range[0][0] == left and block_range[1][0] == top:
+								gradient.color = dark_grey
+							else:
+								gradient.color = light_grey
 								
-
+		# if event.key == pygame.K_ESCAPE:
+		# 	running = False
 
 
 									# elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
