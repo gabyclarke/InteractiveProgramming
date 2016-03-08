@@ -25,12 +25,13 @@ class PyGameSoundGridView(object):
 	def draw(self):
 		"""Draw the blocks to the pygame window"""
 		self.screen.fill(pygame.Color('black'))
-		for block in self.model.blocks.values():
-			r = pygame.Rect(block.left,
-							block.top,
-							block.size,
-							block.size)
-			pygame.draw.rect(self.screen, block.color,r) #pygame.Color(block.color), r)
+		for column in self.model.blocks:
+			for block in column:
+				r = pygame.Rect(block.left,
+								block.top,
+								block.size,
+								block.size)
+				pygame.draw.rect(self.screen, block.color,r) #pygame.Color(block.color), r)
 		pygame.display.update()             
 
 
@@ -48,12 +49,16 @@ class SoundGridModel(object):
 
 		global block_ranges
 		#create dictionary for  block ranges
-		block_ranges = dict()
+		block_ranges = []
+		block_range_column = []
 
-    
-		index = 0
+
+		# leftIndex = 0
+		# topIndex = 0
 		#create dictionary for blocks
-		self.blocks = dict()
+		# self.blocks = dict()
+		self.blocks = []
+		column = []
 		#left edge of each block
 		for left in range(self.MARGIN, #beginning of range
 						  self.width - self.MARGIN - self.BLOCK_SIZE, #end of range
@@ -63,12 +68,18 @@ class SoundGridModel(object):
 							 self.height,
 							 self.MARGIN + self.BLOCK_SIZE):
 			  #assign each block an index number
-				self.blocks[index] = (Block(left,
-										 	top,
-										 	self.BLOCK_SIZE))
+
+				column.append(Block(left, top, self.BLOCK_SIZE))
+				block_range_column.append(((left, left + self.BLOCK_SIZE), (top, top + self.BLOCK_SIZE)))
 			 	#assign block_ranges an index number
-				block_ranges[index] = ((left, left + self.BLOCK_SIZE), (top, top + self.BLOCK_SIZE))
-				index +=1
+				# block_ranges[leftIndex][topIndex] = ((left, left + self.BLOCK_SIZE), (top, top + self.BLOCK_SIZE))
+				# topIndex +=1
+				# index +=1
+			self.blocks.append(column)
+			block_ranges.append(block_range_column)
+			# leftIndex +=1
+			column = []
+			block_range_column = []
 
 
 	#def update(self):
@@ -78,7 +89,7 @@ class SoundGridModel(object):
 
 class Block(object):
 	"""Represents a block in the musical visualization grid"""
-	def __init__(self, left, top, size,color = dark_grey):
+	def __init__(self, left, top, size, color = dark_grey):
 		""""Initializes a block object with the geometry and color"""
 		self.left = left
 		self.top = top
@@ -100,28 +111,39 @@ class PyGameMouseController(object):
 		
 			cursor_position = pygame.mouse.get_pos() # get cursor position
 
-			for index,block_range in block_ranges.items():
-				if cursor_position[0] in range(block_range[0][0], block_range[0][1]) and cursor_position[1] in range(block_range[1][0], block_range[1][1]):
-					pygame.mixer.music.play(0)
-					# b = self.model.blocks[index]
-					# b.color= "blue"
+			for column in range(len(block_ranges)):
+				for row in range(len(block_ranges[column])):
+					if cursor_position[0] in range(block_ranges[column][row][0][0], block_ranges[column][row][0][1]):
+						if cursor_position[1] in range(block_ranges[column][row][1][0], block_ranges[column][row][1][1]):
+							pygame.mixer.music.play(0)
+							clicked = self.model.blocks[column][row]
+							clicked.color= white
 
-					left = block_range[0][0]
-					top = block_range[1][0]
-					unit = self.model.MARGIN + self.model.BLOCK_SIZE
-					for index, block_range in block_ranges.items():
-						gradient = self.model.blocks[index]
-						# print block_range[1] 
-						# if (block_range[0][0] in range(left - unit - 1, left)
-						# 		or block_range[0][0] in range(left+ unit, left+2*unit) 
-						# 		and block_range[1][0] in range(top - unit - 1, top)
-						# 		or block_range[1][0] in range(top+ unit, top +2*unit)): 	
-						if (block_range[0][0] in range(left - unit - 1, left + unit + 1)
-								and block_range[1][0] in range(top - unit - 1, top + unit + 1)):
-							if block_range[0][0] == left and block_range[1][0] == top:
-								gradient.color = dark_grey
-							else:
-								gradient.color = light_grey
+
+			# # for index, block_range in block_ranges.items():
+					# if cursor_position[0] in (range(block_ranges[block_range_column][block_range][0][0], 
+			# 										block_ranges[block_range_column][block_range][0][1]) 
+			# 										and cursor_position[1] in range(block_ranges[block_range_column][block_range][1][0],
+			# 										block_ranges[block_range_column][block_range][1][1])):
+			# 			pygame.mixer.music.play(0)
+			# 			print block_range_column_index, block_range_index
+			# 			clicked = self.model.blocks[block_range_column][block_range]
+			# 			clicked.color= white
+
+			# 			left = block_range[0][0]
+			# 			top = block_range[1][0]
+			# 			unit = self.model.MARGIN + self.model.BLOCK_SIZE
+						# for index, block_range in block_ranges.items():
+						# 	gradient = self.model.blocks[index]
+
+						# 	if (block_range[0][0] in range(left - unit - 1, left + unit + 1)
+						# 			and block_range[1][0] in range(top - unit - 1, top + unit + 1)):
+						# 		if block_range[0][0] == left and block_range[1][0] == top:
+						# 			gradient.color = white
+						# 		else:
+						# 			gradient.color = light_grey
+				# 	block_range_index += 1
+				# block_range_column_index += 1
 								
 		# if event.key == pygame.K_ESCAPE:
 		# 	running = False
@@ -134,6 +156,14 @@ class PyGameMouseController(object):
 		# if pygame.mouse.get_pressed()[0]:
 		# 	self.model.block.color = 'white'
 
+# class PyGameTime(object):
+# 	def __init__(self, time=0):
+# 		self.time = time
+
+# 	def getTime(self):
+# 		print pygame.time.get_ticks()
+
+
 if __name__ == '__main__':
 	pygame.init()
 	size = (420,420)
@@ -142,7 +172,14 @@ if __name__ == '__main__':
 	view = PyGameSoundGridView(model,size)
 	controller = PyGameMouseController(model)
 	running = True
+
+	prevTime = pygame.time.get_ticks()
+	deltaT = 1000
+
 	while running: 
+		if pygame.time.get_ticks() - prevTime > deltaT:
+			prevTime = pygame.time.get_ticks()
+			print prevTime
 		for event in pygame.event.get():
 			if event.type == QUIT:
 				running = False
