@@ -7,7 +7,7 @@ from random import choice
 from math import sqrt
 
 
-global block_ranges
+# global block_ranges
 #colors used
 white = (255,255,255)
 dark_grey = pygame.Color(105,105,105)
@@ -47,43 +47,28 @@ class SoundGridModel(object):
 		self.BLOCK_SIZE = (size[0] - self.MARGIN *(self.block_no + 1)) /self.block_no
 		
 
-		global block_ranges
-		#create dictionary for  block ranges
-		block_ranges = []
+		# global block_ranges
+		self.block_ranges = []
 		block_range_column = []
 
-
-		# leftIndex = 0
-		# topIndex = 0
-		#create dictionary for blocks
-		# self.blocks = dict()
 		self.blocks = []
 		column = []
-		#left edge of each block
+
 		for left in range(self.MARGIN, #beginning of range
 						  self.width - self.MARGIN - self.BLOCK_SIZE, #end of range
 						  self.MARGIN + self.BLOCK_SIZE): #step size
-		  #top edge of each block
 			for top in range(self.MARGIN, 
 							 self.height,
 							 self.MARGIN + self.BLOCK_SIZE):
-			  #assign each block an index number
+			  	if len(column) <= self.block_no - 1:
+					column.append(Block(left, top, self.BLOCK_SIZE))
+					block_range_column.append(((left, left + self.BLOCK_SIZE), (top, top + self.BLOCK_SIZE)))
+			if len(self.blocks) <= self.block_no - 1:
+				self.blocks.append(column)
+				self.block_ranges.append(block_range_column)
+				column = []
+				block_range_column = []
 
-				column.append(Block(left, top, self.BLOCK_SIZE))
-				block_range_column.append(((left, left + self.BLOCK_SIZE), (top, top + self.BLOCK_SIZE)))
-			 	#assign block_ranges an index number
-				# block_ranges[leftIndex][topIndex] = ((left, left + self.BLOCK_SIZE), (top, top + self.BLOCK_SIZE))
-				# topIndex +=1
-				# index +=1
-			self.blocks.append(column)
-			block_ranges.append(block_range_column)
-			# leftIndex +=1
-			column = []
-			block_range_column = []
-
-
-	#def update(self):
-	#	"""Update the model state"""
 
 
 
@@ -99,69 +84,67 @@ class Block(object):
 class PyGameMouseController(object):
 	def __init__(self,model):
 		self.model = model
+		self.toggle = [[0 for row in range(self.model.block_no)] for column in range(self.model.block_no)]
+
+		self.Sounds = ['Sounds/Note1.aiff',
+						'Sounds/Note2.aiff',
+						'Sounds/Note3.aiff',
+						'Sounds/Note4.aiff',
+						'Sounds/Note5.aiff',
+						'Sounds/Note6.aiff',
+						'Sounds/Note7.aiff',
+						'Sounds/Note8.aiff',
+						'Sounds/Note9.aiff',
+						'Sounds/Note10.aiff',
+						'Sounds/Note11.aiff',
+						'Sounds/Note12.aiff',
+						'Sounds/Note13.aiff',
+						'Sounds/Note14.aiff',
+						'Sounds/Note15.aiff',
+						'Sounds/Note16.aiff',
+						'Sounds/Note17.aiff',
+						'Sounds/Note18.aiff',]
+		
+		pygame.mixer.set_num_channels(self.model.block_no)
 
 	def handle_event(self, event):
 		""" When a block is clicked, the color of the block changes color and a sound plays
 		    A wave of grey moves out from the block clicked"""
-		pygame.mixer.music.load('Cobwebs.mp3')
-
-		global block_ranges
-
+		
 		if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 		
 			cursor_position = pygame.mouse.get_pos() # get cursor position
 
-			for column in range(len(block_ranges)):
-				for row in range(len(block_ranges[column])):
-					if cursor_position[0] in range(block_ranges[column][row][0][0], block_ranges[column][row][0][1]):
-						if cursor_position[1] in range(block_ranges[column][row][1][0], block_ranges[column][row][1][1]):
-							pygame.mixer.music.play(0)
+			for column in range(len(self.model.block_ranges)):
+				for row in range(len(self.model.block_ranges[column])):
+					if cursor_position[0] in range(self.model.block_ranges[column][row][0][0],
+																	self.model.block_ranges[column][row][0][1]):
+						if cursor_position[1] in range(self.model.block_ranges[column][row][1][0],
+													self.model.block_ranges[column][row][1][1]):
+							
 							clicked = self.model.blocks[column][row]
-							clicked.color= white
 
+							if self.toggle[column][row] == 0:
+								clicked.color= white
+								self.toggle[column][row] = 1
+							else: #toggle[column][row] == 1:
+								clicked.color= dark_grey
+								self.toggle[column][row] = 0
 
-			# # for index, block_range in block_ranges.items():
-					# if cursor_position[0] in (range(block_ranges[block_range_column][block_range][0][0], 
-			# 										block_ranges[block_range_column][block_range][0][1]) 
-			# 										and cursor_position[1] in range(block_ranges[block_range_column][block_range][1][0],
-			# 										block_ranges[block_range_column][block_range][1][1])):
-			# 			pygame.mixer.music.play(0)
-			# 			print block_range_column_index, block_range_index
-			# 			clicked = self.model.blocks[block_range_column][block_range]
-			# 			clicked.color= white
+							# print self.toggle[column][row]
+							
+						
+	def playColumn(self, column):
+		# print self.toggle[column]
+		for row in range(len(self.toggle[column])):
+			print row
+			if self.toggle[column][row]:
+				# pygame.mixer.music.load(self.Sounds[row])
+				sound = pygame.mixer.Sound(self.Sounds[row])
+				# print self.Sounds[row]
+				sound.play(0)
+				print sound.play(0)
 
-			# 			left = block_range[0][0]
-			# 			top = block_range[1][0]
-			# 			unit = self.model.MARGIN + self.model.BLOCK_SIZE
-						# for index, block_range in block_ranges.items():
-						# 	gradient = self.model.blocks[index]
-
-						# 	if (block_range[0][0] in range(left - unit - 1, left + unit + 1)
-						# 			and block_range[1][0] in range(top - unit - 1, top + unit + 1)):
-						# 		if block_range[0][0] == left and block_range[1][0] == top:
-						# 			gradient.color = white
-						# 		else:
-						# 			gradient.color = light_grey
-				# 	block_range_index += 1
-				# block_range_column_index += 1
-								
-		# if event.key == pygame.K_ESCAPE:
-		# 	running = False
-
-
-									# elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-		# 	print "Button Released" 
-		# 	print pygame.mouse.get_pos()
- 
-		# if pygame.mouse.get_pressed()[0]:
-		# 	self.model.block.color = 'white'
-
-# class PyGameTime(object):
-# 	def __init__(self, time=0):
-# 		self.time = time
-
-# 	def getTime(self):
-# 		print pygame.time.get_ticks()
 
 
 if __name__ == '__main__':
@@ -174,12 +157,19 @@ if __name__ == '__main__':
 	running = True
 
 	prevTime = pygame.time.get_ticks()
-	deltaT = 1000
+	timeIndex = 0
+	deltaT = 500
 
 	while running: 
 		if pygame.time.get_ticks() - prevTime > deltaT:
+			# playColumn()
 			prevTime = pygame.time.get_ticks()
-			print prevTime
+			timeIndex +=1
+			if timeIndex == model.block_no:
+			    timeIndex = 0
+			controller.playColumn(timeIndex)
+			# print prevTime
+			# print timeIndex
 		for event in pygame.event.get():
 			if event.type == QUIT:
 				running = False
