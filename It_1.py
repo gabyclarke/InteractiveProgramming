@@ -110,6 +110,13 @@ class PyGameMouseController(object):
 	def handle_event(self, event):
 		""" When a block is clicked, the color of the block changes color and a sound plays
 		    A wave of grey moves out from the block clicked"""
+		if event.type == QUIT:
+		  return
+
+		if event.type == KEYDOWN:
+			if event.key == pygame.K_ESCAPE:
+			   pygame.quit()
+			   return
 		
 		if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 		
