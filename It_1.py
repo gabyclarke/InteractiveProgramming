@@ -43,7 +43,7 @@ class SoundGridModel(object):
 		self.height = height
 
 		self.MARGIN = 5
-		self.block_no = 12
+		self.block_no = 18
 		self.BLOCK_SIZE = (size[0] - self.MARGIN *(self.block_no + 1)) /self.block_no
 		
 
@@ -110,18 +110,32 @@ class PyGameMouseController(object):
 	def handle_event(self, event):
 		""" When a block is clicked, the color of the block changes color and a sound plays
 		    A wave of grey moves out from the block clicked"""
+
+		self.MousePressed = False
+		self.MouseDown = False
+		self.MouseReleased = False
+
 		if event.type == QUIT:
-		  return
+			return
 
 		if event.type == KEYDOWN:
 			if event.key == pygame.K_ESCAPE:
 			   pygame.quit()
 			   return
 		
-		if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-		
-			cursor_position = pygame.mouse.get_pos() # get cursor position
+		if event.type == pygame.MOUSEBUTTONDOWN:
+			self.MousePressed = True
+			self.MouseDown = True
+	  
+		if event.type == pygame.MOUSEBUTTONUP:
+		    self.MouseReleased = True
+		    self.MouseDown = False
 
+		# if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+		
+		# 	cursor_position = pygame.mouse.get_pos() # get cursor position
+
+    	if MousePressed:
 			for column in range(len(self.model.block_ranges)):
 				for row in range(len(self.model.block_ranges[column])):
 					if cursor_position[0] in range(self.model.block_ranges[column][row][0][0],
@@ -140,17 +154,19 @@ class PyGameMouseController(object):
 
 							# print self.toggle[column][row]
 							
+		# MousePressed = False
+		# MouseReleased = False
 						
 	def playColumn(self, column):
 		# print self.toggle[column]
 		for row in range(len(self.toggle[column])):
-			print row
+			# print row
 			if self.toggle[column][row]:
 				# pygame.mixer.music.load(self.Sounds[row])
 				sound = pygame.mixer.Sound(self.Sounds[row])
 				# print self.Sounds[row]
 				sound.play(0)
-				print sound.play(0)
+				# print sound.play(0)
 
 
 
@@ -165,7 +181,7 @@ if __name__ == '__main__':
 
 	prevTime = pygame.time.get_ticks()
 	timeIndex = 0
-	deltaT = 500
+	deltaT = 150
 
 	while running: 
 		if pygame.time.get_ticks() - prevTime > deltaT:
@@ -177,6 +193,8 @@ if __name__ == '__main__':
 			controller.playColumn(timeIndex)
 			# print prevTime
 			# print timeIndex
+		
+		cursor_position = pygame.mouse.get_pos()
 		for event in pygame.event.get():
 			if event.type == QUIT:
 				running = False
