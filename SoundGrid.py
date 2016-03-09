@@ -15,15 +15,15 @@ grey = (169,169,169)
 light_grey= (220,220,220)
 
 
-class PyGameSoundGridView(object):
-	"""View of sound grid model """
+class sound_grid_view(object):
+	""" View of sound grid model """
+
 	def __init__(self,model,size):
 		self.model = model
 		self.screen = pygame.display.set_mode(size)
 		
-
 	def draw(self):
-		"""Draw the blocks to the pygame window"""
+		""" Draws the blocks to the pygame window """
 		self.screen.fill(pygame.Color('black'))
 		for column in self.model.blocks:
 			for block in column:
@@ -31,38 +31,38 @@ class PyGameSoundGridView(object):
 								block.top,
 								block.size,
 								block.size)
-				pygame.draw.rect(self.screen, block.color,r) #pygame.Color(block.color), r)
+				pygame.draw.rect(self.screen, block.color,r)
 		pygame.display.update()             
 
 
+class sound_grid_model(object):
+	""" Represents the interaction state for the visualization """
 
-class SoundGridModel(object):
-	"""Represents the interaction state for the visualization"""
 	def __init__(self, width, height):
 		self.width = width
 		self.height = height
 
-		self.MARGIN = 5
+		self.margin = 5
 		self.block_no = 15
-		self.BLOCK_SIZE = (size[0] - self.MARGIN *(self.block_no + 1)) /self.block_no
+		self.block_size = (size[0] - self.margin *(self.block_no + 1)) /self.block_no
 		
-
-		# global block_ranges
 		self.block_ranges = []
 		block_range_column = []
 
 		self.blocks = []
 		column = []
 
-		for left in range(self.MARGIN, #beginning of range
-						  self.width - self.MARGIN - self.BLOCK_SIZE, #end of range
-						  self.MARGIN + self.BLOCK_SIZE): #step size
-			for top in range(self.MARGIN, 
+		# generates columns of blocks by sweeping x- and y-axes
+		# blocks stored in self.blocks
+		for left in range(self.margin, #beginning of range
+						  self.width - self.margin - self.block_size, #end of range
+						  self.margin + self.block_size): #step size
+			for top in range(self.margin, 
 							 self.height,
-							 self.MARGIN + self.BLOCK_SIZE):
+							 self.margin + self.block_size):
 			  	if len(column) <= self.block_no - 1:
-					column.append(Block(left, top, self.BLOCK_SIZE))
-					block_range_column.append(((left, left + self.BLOCK_SIZE), (top, top + self.BLOCK_SIZE)))
+					column.append(block(left, top, self.block_size))
+					block_range_column.append(((left, left + self.block_size), (top, top + self.block_size)))
 			if len(self.blocks) <= self.block_no - 1:
 				self.blocks.append(column)
 				self.block_ranges.append(block_range_column)
@@ -70,29 +70,25 @@ class SoundGridModel(object):
 				block_range_column = []
 
 
+class block(object):
+	""" Represents a block in the musical visualization grid """
 
-
-class Block(object):
-	"""Represents a block in the musical visualization grid"""
 	def __init__(self, left, top, size, color = dark_grey):
 		self.left = left
 		self.top = top
 		self.size = size
 		self.color = color
 
-class PyGameMouseController(object):
+
+class controller(object):
+	""" Manages user input """
 	def __init__(self, model):
 		self.model = model
 		self.toggle = [[0 for row in range(self.model.block_no)] for column in range(self.model.block_no)]
 
-		# mouse event state initializations
-		self.mousePressed = False
-		self.mouseDown = False
-		self.mouseReleased = False
-
 		# sound initializations
 		pygame.mixer.set_num_channels(self.model.block_no) # sets number of channels to number of blocks
-		self.Sounds = ['Sounds/Note1.aiff',
+		self.sounds = ['Sounds/Note1.aiff',
 						'Sounds/Note2.aiff',
 						'Sounds/Note3.aiff',
 						'Sounds/Note5.aiff',
@@ -107,11 +103,12 @@ class PyGameMouseController(object):
 						'Sounds/Note16.aiff',
 						'Sounds/Note17.aiff',
 						'Sounds/Note18.aiff',]
-		
 
 	def handle_event(self, event):
 		""" When a block is clicked, the color of the block changes color and a sound plays
-		    A wave of grey moves out from the block clicked"""
+		    A wave of grey moves out from the block clicked
+
+		    event: pygame event while running"""
 
 		if event.type == QUIT:
 			return
@@ -137,17 +134,16 @@ class PyGameMouseController(object):
 							else: #toggle[column][row] == 1:
 								clicked.color= dark_grey
 								self.toggle[column][row] = 0
-
 						
-	def playColumn(self, column):
-		""" plays selected block sounds in the current column on separate channels 
+	def play_column(self, column):
+		""" Plays selected block sounds in the current column on separate channels 
 
 			column: current column index
 		"""
 
 		for row in range(len(self.toggle[column])):
 			if self.toggle[column][row]:
-				sound = pygame.mixer.Sound(self.Sounds[row])
+				sound = pygame.mixer.Sound(self.sounds[row])
 				sound.play(0)
 				self.model.blocks[column][row].color = white
 		for row in range(len(self.toggle[column - 1])):
@@ -159,22 +155,22 @@ if __name__ == '__main__':
 	pygame.init()
 	size = (420,420)
 
-	model = SoundGridModel(size[0],size[1])
-	view = PyGameSoundGridView(model,size)
-	controller = PyGameMouseController(model)
+	model = sound_grid_model(size[0],size[1])
+	view = sound_grid_view(model,size)
+	controller = controller(model)
 	running = True
 
-	prevTime = pygame.time.get_ticks()
-	timeIndex = 0
+	prev_time = pygame.time.get_ticks()
+	time_index = 0
 	deltaT = 150
 
 	while running: 
-		if pygame.time.get_ticks() - prevTime > deltaT:
-			prevTime = pygame.time.get_ticks()
-			timeIndex +=1
-			if timeIndex == model.block_no:
-			    timeIndex = 0
-			controller.playColumn(timeIndex)
+		if pygame.time.get_ticks() - prev_time > deltaT:
+			prev_time = pygame.time.get_ticks()
+			time_index +=1
+			if time_index == model.block_no:
+			    time_index = 0
+			controller.play_column(time_index)
 
 		cursor_position = pygame.mouse.get_pos()
 
