@@ -153,7 +153,7 @@ class controller(object):
 
 if __name__ == '__main__':
 	pygame.init()
-	size = (420,420)
+	size = (600,600)
 
 	model = sound_grid_model(size[0],size[1])
 	view = sound_grid_view(model,size)
